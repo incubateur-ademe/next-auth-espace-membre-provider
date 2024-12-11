@@ -1,0 +1,38 @@
+; top-most EditorConfig file
+root = true
+
+; Unix-style newlines
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+
+[*.lock]
+indent_size = 2
+
+[*.dtd]
+indent_size = 2
+
+[*.y{,a}ml{,.dist}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.gitignore]
+trim_trailing_whitespace = false
+
+[*.json]
+indent_size = 2
+
+[*.{t,j}s{,x}]
+indent_size = 2
+trim_trailing_whitespace = false
+
+[*.{{,s}c,le}ss]
+indent_size = 4
+trim_trailing_whitespace = false
+
+[package.json]

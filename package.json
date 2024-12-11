@@ -1,0 +1,35 @@
+{
+  "name": "@incubateur-ademe/next-auth-espace-membre-provider",
+  "version": "0.0.1",
+  "description": "NextAuth.js provider pour l'Espace Membre BetaGouv",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/incubateur-ademe/next-auth-espace-membre-provider.git",
+    "directory": "packages/react"
+  },
+  "author": "Incubateur ADEME <accelerateurdelatransitionecologique@ademe.fr>",
+  "license": "MIT",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": "./dist/index.js",
+    "./EspaceMembreClient": "./dist/client/index.js"
+  },
+  "scripts": {
+    "build": "vite build",
+    "lint": "biome check ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@tsconfig/recommended": "^1.0.8",
+    "@types/node": "^18",
+    "next-auth": "beta",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vite-plugin-dts": "^4.3.0"
+  },
+  "peerDependencies": {
+    "next-auth": "beta"
+  }
+}
