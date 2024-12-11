@@ -10,6 +10,15 @@ import { HttpStatusCode } from "../utils/HttpStatusCode";
 export class ApiMember {
   constructor(protected client: EspaceMembreClient) {}
 
+  /**
+   * Récupère un membre par son nom d'utilisateur.
+   *
+   * @param username Nom d'utilisateur du membre à récupérer.
+   * @param fetchOptions Options de fetch à utiliser pour la requête.
+   *
+   * @throws {EspaceMembreClientError} Si une erreur est survenue lors de la récupération du membre.
+   * @throws {EspaceMembreClientMemberNotFoundError} Si aucun membre n'a été trouvé avec le nom d'utilisateur donné.
+   */
   public async getByUsername(
     username: string,
     fetchOptions?: Base.RegisteredFetchOptions,

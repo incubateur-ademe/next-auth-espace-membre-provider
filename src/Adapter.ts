@@ -13,8 +13,14 @@ function assertMinimalAdapter(
   }
 }
 
+/**
+ * Wrapper pour l'adaptateur de NextAuth.
+ */
 export type AdapterWrapper = (originalAdapter: Adapter) => Adapter;
 
+/**
+ * Récupère le wrapper pour l'adaptateur de NextAuth.
+ */
 export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
   return (originalAdapter) => {
     assertMinimalAdapter(originalAdapter);
@@ -22,9 +28,9 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
     return {
       ...originalAdapter,
       async createUser(user) {
-        const betaGouvUser = await client
-          .member()
-          .getByUsername(user.email /* email is actually username here */);
+        const betaGouvUser = await client.member.getByUsername(
+          user.email /* email is actually username here */,
+        );
 
         const verifiedUser: AdapterUser = {
           ...user,
@@ -45,9 +51,9 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
           return originalAdapter.getUserByEmail(email);
         }
 
-        const betaGouvUser = await client
-          .member()
-          .getByUsername(email /* email is actually username here */);
+        const betaGouvUser = await client.member.getByUsername(
+          email /* email is actually username here */,
+        );
 
         return originalAdapter.getUserByEmail(
           betaGouvUser.communication_email === "primary"

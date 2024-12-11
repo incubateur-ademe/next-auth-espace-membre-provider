@@ -11,12 +11,45 @@ import { exponentialBackoffWithJitter } from "./utils/exponentialBackoffWithJitt
 type CustomHeaders = Record<string, string>;
 
 export interface ClientOptions {
-  apiKey: string;
+  /**
+   * Clef d'API pour se connecter à l'Espace Membre.
+   *
+   * @default process.env.ESPACE_MEMBRE_API_KEY
+   */
+  apiKey?: string;
+  /**
+   * Headers personnalisés à ajouter à chaque requête.
+   */
   customHeaders?: CustomHeaders;
+  /**
+   * URL de l'Espace Membre.
+   *
+   * @default process.env.ESPACE_MEMBRE_URL "https://espace-membre.incubateur.net"
+   */
   endpointUrl?: string;
+  /**
+   * Fonction de fetch à utiliser pour les requêtes.
+   *
+   * @see {@link Base.RegisterFetch}
+   */
   fetch?: Base.RegisteredFetch;
+  /**
+   * Options à passer à la fonction de fetch pour chaque requête.
+   *
+   * @see {@link Base.RegisterFetch}
+   */
   fetchOptions?: Base.RegisteredFetchOptions;
+  /**
+   * Ne pas réessayer la requête si le taux limite est atteint.
+   *
+   * @default false
+   */
   noRetryIfRateLimited?: boolean;
+  /**
+   * Délai d'attente pour la requête en millisecondes.
+   *
+   * @default 300000 (5 minutes)
+   */
   requestTimeout?: number;
 }
 const API_BASE_PATH = "/api/protected";
@@ -43,6 +76,9 @@ interface BaseRequestOptions {
   // qs?: Record<string, unknown>; // TODO: Add support for query string parameters
 }
 
+/**
+ * Client pour l'API de l'Espace Membre.
+ */
 export class EspaceMembreClient {
   public readonly apiKey: string;
   public readonly customHeaders: CustomHeaders;
@@ -61,7 +97,7 @@ export class EspaceMembreClient {
     noRetryIfRateLimited,
     requestTimeout,
   }: ClientOptions) {
-    this.apiKey = apiKey;
+    this.apiKey = apiKey ?? defaultConfig.apiKey;
     this.customHeaders = customHeaders ?? defaultConfig.customHeaders;
     this.endpointUrl = endpointUrl ?? defaultConfig.endpointUrl;
     this.fetch = fetch ?? defaultConfig.fetch;
@@ -75,6 +111,13 @@ export class EspaceMembreClient {
         "Une clef d'API est obligatoire pour se connecter à l'Espace Membre.",
       );
     }
+  }
+
+  /**
+   * API pour les membres : "/api/protected/member".
+   */
+  public get member() {
+    return new ApiMember(this);
   }
 
   public async makeRequest<T>(
@@ -175,9 +218,5 @@ export class EspaceMembreClient {
     }
 
     return defaultHeaders;
-  }
-
-  public member() {
-    return new ApiMember(this);
   }
 }

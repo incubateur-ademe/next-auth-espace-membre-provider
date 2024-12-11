@@ -2,7 +2,10 @@ import type { CommonProviderOptions } from "next-auth/providers";
 import type { NodemailerConfig } from "next-auth/providers/nodemailer";
 import type { EspaceMembreClient } from "./client";
 
-export const ESPACE_MEMBRE_PROVIDER_ID = "betagouv-email";
+/**
+ * À utiliser lors de l'utilisation de la fonction `signIn` de l'API de NextAuth.
+ */
+export const ESPACE_MEMBRE_PROVIDER_ID = "espace-membre-beta-gouv-email";
 
 function assertEmailProviderConfig(
   config: CommonProviderOptions,
@@ -14,10 +17,16 @@ function assertEmailProviderConfig(
   }
 }
 
+/**
+ * Wrapper pour la configuration du fournisseur d'authentification.
+ */
 export type ProviderConfigWrapper = (
   originalConfig: NodemailerConfig,
 ) => NodemailerConfig;
 
+/**
+ * Récupère le wrapper pour la configuration du fournisseur d'authentification.
+ */
 export function getProviderConfigWrapper(
   client: EspaceMembreClient,
 ): ProviderConfigWrapper {
@@ -31,7 +40,7 @@ export function getProviderConfigWrapper(
         identifier: betaUsername,
         ...params
       }) => {
-        const user = await client.member().getByUsername(betaUsername);
+        const user = await client.member.getByUsername(betaUsername);
         return originalConfig.sendVerificationRequest({
           ...params,
           identifier:

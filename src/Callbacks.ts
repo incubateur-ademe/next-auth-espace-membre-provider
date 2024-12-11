@@ -1,3 +1,5 @@
+// biome-ignore lint/style/useImportType: utilisé pour la doc
+import { type AuthConfig } from "@auth/core";
 import type { NextAuthConfig } from "next-auth";
 import { ESPACE_MEMBRE_PROVIDER_ID } from "./ProviderConfig";
 import {
@@ -8,6 +10,9 @@ import {
 
 type JWTCallback = Required<Required<NextAuthConfig>["callbacks"]>["jwt"];
 type AugmentedCallbacks = Omit<Required<NextAuthConfig>["callbacks"], "jwt"> & {
+  /**
+   * @see {@link AuthConfig~callbacks}
+   */
   jwt?: (
     params: Parameters<JWTCallback>["0"] & {
       /**
@@ -20,10 +25,16 @@ type AugmentedCallbacks = Omit<Required<NextAuthConfig>["callbacks"], "jwt"> & {
   ) => ReturnType<JWTCallback>;
 };
 
+/**
+ * Wrapper pour les callbacks de NextAuth.
+ */
 export type CallbacksWrapper = (
   originalCallbacks: AugmentedCallbacks,
 ) => AugmentedCallbacks;
 
+/**
+ * Récupère le wrapper pour les callbacks de NextAuth.
+ */
 export function getCallbacksWrapper(
   client: EspaceMembreClient,
 ): CallbacksWrapper {
@@ -42,7 +53,7 @@ export function getCallbacksWrapper(
           }
           const username = params.user.email;
           try {
-            const betaUser = await client.member().getByUsername(username);
+            const betaUser = await client.member.getByUsername(username);
 
             params.user.name = betaUser.fullname;
             params.user.image = betaUser.avatar;
@@ -75,9 +86,7 @@ export function getCallbacksWrapper(
               "EspaceMembreProviderWrapper.jwt: `token.sub` is required when using the Espace Membre provider",
             );
           }
-          const betaUser = await client
-            .member()
-            .getByUsername(params.token.sub);
+          const betaUser = await client.member.getByUsername(params.token.sub);
           return (
             originalCallbacks?.jwt?.({
               ...params,
