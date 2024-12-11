@@ -24,7 +24,7 @@ export class ApiMember {
       return this.client.makeRequest<Member>(
         {
           method: "GET",
-          path: `/members/${encodeURIComponent(username)}`,
+          path: `/member/${encodeURIComponent(username)}`,
         },
         fetchOptions,
       );
