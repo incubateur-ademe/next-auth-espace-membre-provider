@@ -64,6 +64,26 @@ const client = new EspaceMembreClient({
 const member: Member = await client.member.getByUsername("nom-d-utilisateur");
 ```
 
+#### ℹ️ Fetch custom
+Pour enregistrer une implémentation de fetch personnalisée, vous devez fournir une fonction `fetch` qui se comporte comme la fonction native `fetch`. Cette fonction sera utilisée pour effectuer des requêtes à l'API de l'Espace Membre.
+
+```typescript
+import { EspaceMembreClient } from '@incubateur-ademe/next-auth-espace-membre-provider/client';
+import { myCustomFetch } from './myCustomFetch';
+
+declare "@incubateur-ademe/next-auth-espace-membre-provider/client" {
+ namespace EspaceMembreClient {
+  interface RegisterFetch {
+   fetch: typeof myCustomFetch;
+  }
+ }
+}
+
+const client = new EspaceMembreClient({
+  fetch: myCustomFetch,
+});
+```
+
 ## Configuration additionnelle
 Si besoin, vous pouvez ajouter des variables d'environnement pour configurer le client utilisé par le provider.
 ```bash

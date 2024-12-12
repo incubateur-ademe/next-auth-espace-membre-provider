@@ -1,8 +1,9 @@
 {
   "name": "@incubateur-ademe/next-auth-espace-membre-provider",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "NextAuth.js provider pour l'Espace Membre BetaGouv",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/incubateur-ademe/next-auth-espace-membre-provider.git",
@@ -13,8 +14,14 @@
   "type": "module",
   "files": ["dist"],
   "exports": {
-    ".": "./dist/index.js",
-    "./EspaceMembreClient": "./dist/client/index.js"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./EspaceMembreClient": {
+      "import": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    }
   },
   "scripts": {
     "build": "vite build",

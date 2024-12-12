@@ -4,17 +4,18 @@ export * from "./types";
 
 export namespace EspaceMembreClient {
   /**
-   * Add a custom fetch implementation to the Espace Membre client module.
+   * Ajouter une implémentation de fetch personnalisée au module client de l'Espace Membre.
    *
-   * To register a custom fetch implementation, you must provide a `fetch` function that
-   * behaves like the native `fetch` function. This function will be used to make requests
-   * to the Airtable API.
+   * Pour enregistrer une implémentation de fetch personnalisée, vous devez fournir une fonction `fetch` qui
+   * se comporte comme la fonction native `fetch`. Cette fonction sera utilisée pour effectuer des requêtes
+   * à l'API de l'Espace Membre.
    *
    * @example
    * ```typescript
-   * import EspaceMembreClient from '@incubateur-ademe/next-auth-espace-membre-provider';
+   * import { EspaceMembreClient } from '@incubateur-ademe/next-auth-espace-membre-provider/client';
+   * import { myCustomFetch } from './myCustomFetch';
    *
-   * declare "@incubateur-ademe/next-auth-espace-membre-provider" {
+   * declare "@incubateur-ademe/next-auth-espace-membre-provider/client" {
    *  namespace EspaceMembreClient {
    *   interface RegisterFetch {
    *    fetch: typeof myCustomFetch;
@@ -22,7 +23,7 @@ export namespace EspaceMembreClient {
    *  }
    * }
    *
-   * EspaceMembreClient.configure({
+   * const client = new EspaceMembreClient({
    *   fetch: myCustomFetch,
    * });
    * ```
