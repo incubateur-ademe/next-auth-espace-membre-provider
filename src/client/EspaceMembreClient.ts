@@ -130,7 +130,6 @@ export class EspaceMembreClient {
       `${API_BASE_PATH}${options.path ?? "/"}`,
       this.endpointUrl,
     );
-    url.searchParams.append("apiKey", this.apiKey);
 
     const controller = new AbortController();
     const headers = this.getRequestHeaders({
@@ -206,6 +205,7 @@ export class EspaceMembreClient {
     const defaultHeaders: CustomHeaders = {
       "User-Agent": userAgent,
       "Content-Type": "application/json",
+      "X-API-Key": this.apiKey,
     };
     for (const [key, value] of Object.entries(headers)) {
       if (
