@@ -5,22 +5,12 @@ import {
   getProviderConfigWrapper,
 } from "./ProviderConfig";
 import { EspaceMembreClient } from "./client";
-import type { ClientOptions } from "./client/EspaceMembreClient";
+import type {
+  EspaceMembreAuthOptions,
+  EspaceMembreProviderConfig,
+} from "./types";
 
-export interface EspaceMembreProviderConfig {
-  /**
-   * @see {@link ClientOptions.apiKey}
-   */
-  espaceMembreApiKey?: string;
-  /**
-   * @see {@link ClientOptions.fetch}
-   */
-  fetch?: EspaceMembreClient.RegisteredFetch;
-  /**
-   * @see {@link ClientOptions.fetchOptions}
-   */
-  fetchOptions?: EspaceMembreClient.RegisteredFetchOptions;
-}
+export type * from "./types";
 
 /**
  * Wrappers pour les différentes parties de la configuration du provider.
@@ -54,6 +44,9 @@ export interface EspaceMembreProviderWrappers {
       },
       cache: "default",
     },
+    authOptions: {
+      allowInactive: true, // optionnel, par défaut `false` (permet d'autoriser les membres inactifs à se connecter)
+    }
   });
 
   export default NextAuth({
@@ -86,10 +79,15 @@ export function EspaceMembreProvider(config: EspaceMembreProviderConfig) {
     fetchOptions: config.fetchOptions,
   });
 
+  const authOptionsOrDefault: Required<EspaceMembreAuthOptions> = {
+    allowInactive: false,
+    ...config.authOptions,
+  };
+
   return {
     ProviderWrapper: getProviderConfigWrapper(client),
     AdapterWrapper: getAdapterWrapper(client),
-    CallbacksWrapper: getCallbacksWrapper(client),
+    CallbacksWrapper: getCallbacksWrapper(client, authOptionsOrDefault),
   } as const;
 }
 

@@ -7,6 +7,7 @@ import {
   EspaceMembreClientError,
   type Member,
 } from "./client";
+import type { EspaceMembreAuthOptions } from "./types";
 
 type JWTCallback = Required<Required<NextAuthConfig>["callbacks"]>["jwt"];
 type AugmentedCallbacks = Omit<Required<NextAuthConfig>["callbacks"], "jwt"> & {
@@ -37,6 +38,7 @@ export type CallbacksWrapper = (
  */
 export function getCallbacksWrapper(
   client: EspaceMembreClient,
+  authOptions: Required<EspaceMembreAuthOptions>,
 ): CallbacksWrapper {
   return (originalCallbacks) => {
     return {
@@ -54,6 +56,10 @@ export function getCallbacksWrapper(
           const username = params.user.email;
           try {
             const betaUser = await client.member.getByUsername(username);
+
+            if (!authOptions.allowInactive && !betaUser.isActive) {
+              return false;
+            }
 
             params.user.name = betaUser.fullname;
             params.user.image = betaUser.avatar;

@@ -21,6 +21,9 @@ const espaceMembreProvider = EspaceMembreProvider({
     },
     cache: "default",
   },
+  authOptions: {
+    allowInactive: true, // optionnel, par défaut `false` (permet d'autoriser les membres inactifs à se connecter)
+  }
 });
 
 export default NextAuth({

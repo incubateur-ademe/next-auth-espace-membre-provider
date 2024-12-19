@@ -20,6 +20,7 @@ export type Member = {
   updated_at: string;
   username: string;
   uuid: string;
+  isActive: boolean;
 };
 
 export type Mission = {
