@@ -8,6 +8,7 @@ import {
   type Member,
 } from "./client";
 import type { EspaceMembreAuthOptions } from "./types";
+import type { AdapterUser } from "next-auth/adapters";
 
 type JWTCallback = Required<Required<NextAuthConfig>["callbacks"]>["jwt"];
 type AugmentedCallbacks = Omit<Required<NextAuthConfig>["callbacks"], "jwt"> & {
@@ -53,7 +54,8 @@ export function getCallbacksWrapper(
               "EspaceMembreProviderWrapper.signIn: `user.email` is required when using the Espace Membre provider",
             );
           }
-          const username = params.user.email;
+          const username =
+            (params.user as AdapterUser).username || params.user.email;
           try {
             const betaUser = await client.member.getByUsername(username);
 
@@ -87,12 +89,9 @@ export function getCallbacksWrapper(
           params.trigger !== "update" &&
           params.account?.provider === ESPACE_MEMBRE_PROVIDER_ID
         ) {
-          if (!params.token.sub) {
-            throw new Error(
-              "EspaceMembreProviderWrapper.jwt: `token.sub` is required when using the Espace Membre provider",
-            );
-          }
-          const betaUser = await client.member.getByUsername(params.token.sub);
+          const betaUser = await client.member.getByUsername(
+            (params.user as AdapterUser).username,
+          );
           return (
             originalCallbacks?.jwt?.({
               ...params,

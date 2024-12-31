@@ -13,6 +13,17 @@ function assertMinimalAdapter(
   }
 }
 
+declare module "@auth/core/adapters" {
+  interface AdapterUser {
+    /**
+     * "username" du membre de l'espace membre.
+     *
+     * @info Overloadé par "@incubateur-ademe/next-auth-espace-membre-provider".
+     */
+    username: string;
+  }
+}
+
 /**
  * Wrapper pour l'adaptateur de NextAuth.
  */
@@ -39,20 +50,20 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
             betaGouvUser.communication_email === "primary"
               ? betaGouvUser.primary_email
               : betaGouvUser.secondary_email,
-          id: betaGouvUser.username,
+          username: betaGouvUser.username,
           image: betaGouvUser.avatar,
         };
 
         return originalAdapter.createUser(verifiedUser);
       },
 
-      async getUserByEmail(email) {
-        if (email.includes("@")) {
-          return originalAdapter.getUserByEmail(email);
+      async getUserByEmail(emailOrUsername) {
+        if (emailOrUsername.includes("@")) {
+          return originalAdapter.getUserByEmail(emailOrUsername);
         }
 
         const betaGouvUser = await client.member.getByUsername(
-          email /* email is actually username here */,
+          emailOrUsername /* email is actually username here */,
         );
 
         return originalAdapter.getUserByEmail(
