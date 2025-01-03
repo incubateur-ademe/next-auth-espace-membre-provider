@@ -30,7 +30,8 @@ export class ApiMember {
     }
 
     try {
-      return this.client.makeRequest<Member>(
+      // we have to await here to catch the error
+      return await this.client.makeRequest<Member>(
         {
           method: "GET",
           path: `/member/${encodeURIComponent(username)}`,

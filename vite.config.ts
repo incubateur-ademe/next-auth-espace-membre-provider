@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
     lib: {
-      entry: "src/index.ts",
+      entry: ["src/index.ts", "src/client/index.ts"],
       formats: ["es"],
     },
     rollupOptions: {
