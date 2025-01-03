@@ -1,6 +1,7 @@
 // biome-ignore lint/style/useImportType: utilisé pour la doc
 import { type AuthConfig } from "@auth/core";
 import type { NextAuthConfig } from "next-auth";
+import type { AdapterUser } from "next-auth/adapters";
 import { ESPACE_MEMBRE_PROVIDER_ID } from "./ProviderConfig";
 import {
   type EspaceMembreClient,
@@ -8,7 +9,6 @@ import {
   type Member,
 } from "./client";
 import type { EspaceMembreAuthOptions } from "./types";
-import type { AdapterUser } from "next-auth/adapters";
 
 type JWTCallback = Required<Required<NextAuthConfig>["callbacks"]>["jwt"];
 type AugmentedCallbacks = Omit<Required<NextAuthConfig>["callbacks"], "jwt"> & {
