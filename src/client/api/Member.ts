@@ -4,7 +4,7 @@ import {
   EspaceMembreClientError,
   EspaceMembreClientMemberNotFoundError,
 } from "../error";
-import type { Member } from "../types";
+import type { Member } from "../models";
 import { HttpStatusCode } from "../utils/HttpStatusCode";
 
 export class ApiMember {
