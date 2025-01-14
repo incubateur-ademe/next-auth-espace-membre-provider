@@ -3,7 +3,9 @@ import {
   name as packageName,
   version as packageVersion,
 } from "../../package.json" with { type: "json" };
+import { ApiIncubator } from "./api/Incubator";
 import { ApiMember } from "./api/Member";
+import { ApiStartup } from "./api/Startup";
 import { EspaceMembreClientError } from "./error";
 import { HttpStatusCode } from "./utils/HttpStatusCode";
 import { exponentialBackoffWithJitter } from "./utils/exponentialBackoffWithJitter";
@@ -118,6 +120,20 @@ export class EspaceMembreClient {
    */
   public get member() {
     return new ApiMember(this);
+  }
+
+  /**
+   * API pour les startups : "/api/protected/startup".
+   */
+  public get startup() {
+    return new ApiStartup(this);
+  }
+
+  /**
+   * API pour les incubateurs : "/api/protected/incubator".
+   */
+  public get incubator() {
+    return new ApiIncubator(this);
   }
 
   public async makeRequest<T>(
