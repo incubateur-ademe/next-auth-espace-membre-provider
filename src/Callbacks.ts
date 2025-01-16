@@ -64,7 +64,10 @@ export function getCallbacksWrapper(
             }
 
             params.user.name = betaUser.fullname;
-            params.user.image = betaUser.avatar;
+            params.user.image = betaUser.avatar?.replace(
+              "/api/member",
+              "/api/public/member",
+            );
             params.user.email =
               betaUser.communication_email === "primary"
                 ? betaUser.primary_email
