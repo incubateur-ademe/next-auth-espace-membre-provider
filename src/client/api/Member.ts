@@ -30,14 +30,19 @@ export class ApiMember {
     }
 
     try {
-      // we have to await here to catch the error
-      return await this.client.makeRequest<Member>(
+      const member: Member = await this.client.makeRequest<Member>(
         {
           method: "GET",
           path: `/member/${encodeURIComponent(username)}`,
         },
         fetchOptions,
       );
+
+      return {
+        ...member,
+        avatar:
+          member.avatar?.replace("/api/member", "/api/public/member") ?? null,
+      };
     } catch (error: unknown) {
       if (
         error instanceof EspaceMembreClientError &&
