@@ -47,7 +47,7 @@ export class ApiStartup {
   public async getByGhid(
     ghid: string,
     fetchOptions?: Base.RegisteredFetchOptions,
-  ): Promise<Startup> {
+  ): Promise<StartupWithIncubator> {
     try {
       return await this.client.makeRequest<StartupWithIncubator>(
         {
