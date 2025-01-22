@@ -43,4 +43,23 @@ export class ApiStartup {
       );
     }
   }
+
+  public async getByGhid(
+    ghid: string,
+    fetchOptions?: Base.RegisteredFetchOptions,
+  ): Promise<Startup> {
+    try {
+      return await this.client.makeRequest<StartupWithIncubator>(
+        {
+          method: "GET",
+          path: `/startup/${ghid}`,
+        },
+        fetchOptions,
+      );
+    } catch (error: unknown) {
+      throw new EspaceMembreClientError(
+        `Une erreur est survenue lors de la récupération de la startup. (${(error as Error).message})`,
+      );
+    }
+  }
 }
