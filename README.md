@@ -94,5 +94,8 @@ ESPACE_MEMBRE_API_KEY=votre-api-key
 ESPACE_MEMBRE_URL=https://espace-membre.incubateur.net # pour changer l'URL de l'API en local par exemple
 ```
 
+### Dans la table `User` en base de données
+- `username` est à ajouter pour stocker le nom d'utilisateur de l'espace membre
+
 ## Licence
 [MIT](./LICENSE)

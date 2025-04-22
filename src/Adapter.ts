@@ -1,5 +1,5 @@
 import type { Adapter, AdapterUser } from "next-auth/adapters";
-import type { EspaceMembreClient } from "./client";
+import type { EspaceMembreClient, Member } from "./client";
 
 type MinimalAdapter = Omit<Adapter, "createUser" | "getUserByEmail"> &
   Required<Pick<Adapter, "createUser" | "getUserByEmail">>;
@@ -13,12 +13,18 @@ function assertMinimalAdapter(
   }
 }
 
+const getUserEmail = (betaGouvUser: Member): string =>
+  betaGouvUser.communication_email === "primary"
+    ? betaGouvUser.primary_email
+    : betaGouvUser.secondary_email;
+
 declare module "@auth/core/adapters" {
   interface AdapterUser {
     /**
      * "username" du membre de l'espace membre.
      *
      * @info Overloadé par "@incubateur-ademe/next-auth-espace-membre-provider".
+     * @info Doit être ajouté en base de données pour que l'adaptateur fonctionne.
      */
     username: string;
   }
@@ -39,6 +45,11 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
     return {
       ...originalAdapter,
       async createUser(user) {
+        if (user.email.includes("@")) {
+          return originalAdapter.createUser(user);
+        }
+
+        // Si l'utilisateur n'a pas d'email, on le crée avec le username
         const betaGouvUser = await client.member.getByUsername(
           user.email /* email is actually username here */,
         );
@@ -46,10 +57,7 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
         const verifiedUser: AdapterUser = {
           ...user,
           name: betaGouvUser.fullname,
-          email:
-            betaGouvUser.communication_email === "primary"
-              ? betaGouvUser.primary_email
-              : betaGouvUser.secondary_email,
+          email: getUserEmail(betaGouvUser),
           username: betaGouvUser.username,
           image: betaGouvUser.avatar,
         };
@@ -66,11 +74,7 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
           emailOrUsername /* email is actually username here */,
         );
 
-        return originalAdapter.getUserByEmail(
-          betaGouvUser.communication_email === "primary"
-            ? betaGouvUser.primary_email
-            : betaGouvUser.secondary_email,
-        );
+        return originalAdapter.getUserByEmail(getUserEmail(betaGouvUser));
       },
     };
   };
