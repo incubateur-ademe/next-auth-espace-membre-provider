@@ -11,7 +11,9 @@
   "author": "Incubateur ADEME <accelerateurdelatransitionecologique@ademe.fr>",
   "license": "MIT",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -30,8 +32,8 @@
     "@biomejs/biome": "1.9.4",
     "@tsconfig/recommended": "^1.0.8",
     "@types/node": "^18",
-    "next-auth": "^5.0.0-0",
     "next": "^15",
+    "next-auth": "^5.0.0-0",
     "react": "^19",
     "react-dom": "^19",
     "typescript": "^5.7.2",
