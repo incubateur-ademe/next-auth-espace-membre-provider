@@ -96,6 +96,7 @@ ESPACE_MEMBRE_URL=https://espace-membre.incubateur.net # pour changer l'URL de l
 
 ### Dans la table `User` en base de données
 - `username` est à ajouter pour stocker le nom d'utilisateur de l'espace membre
+- `isBetaGouvMember` est à ajouter pour attester que l'utilisateur vient de beta.gouv
 
 ## Licence
 [MIT](./LICENSE)
