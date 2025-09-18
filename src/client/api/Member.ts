@@ -37,11 +37,15 @@ export class ApiMember {
         },
         fetchOptions,
       );
+      let avatar =
+        member.avatar?.replace("/api/member", "/api/public/member") ?? null;
+      if (avatar && !avatar.startsWith("http")) {
+        avatar = `${this.client.endpointUrl}${avatar}`;
+      }
 
       return {
         ...member,
-        avatar:
-          member.avatar?.replace("/api/member", "/api/public/member") ?? null,
+        avatar,
       };
     } catch (error: unknown) {
       if (

@@ -27,6 +27,13 @@ declare module "@auth/core/adapters" {
      * @info Doit être ajouté en base de données pour que l'adaptateur fonctionne.
      */
     username: string;
+    /**
+     * Atteste que l'utilisateur vient de beta.gouv.
+     *
+     * @info Overloadé par "@incubateur-ademe/next-auth-espace-membre-provider".
+     * @info Doit être ajouté en base de données pour que l'adaptateur fonctionne.
+     */
+    isBetaGouvMember: boolean;
   }
 }
 
@@ -60,6 +67,7 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
           email: getUserEmail(betaGouvUser),
           username: betaGouvUser.username,
           image: betaGouvUser.avatar,
+          isBetaGouvMember: true,
         };
 
         return originalAdapter.createUser(verifiedUser);
