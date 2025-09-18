@@ -88,6 +88,7 @@ export function EspaceMembreProvider(config: EspaceMembreProviderConfig) {
     ProviderWrapper: getProviderConfigWrapper(client),
     AdapterWrapper: getAdapterWrapper(client),
     CallbacksWrapper: getCallbacksWrapper(client, authOptionsOrDefault),
+    client,
   } as const;
 }
 
