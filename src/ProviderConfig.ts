@@ -33,15 +33,27 @@ export function getProviderConfigWrapper(
   return (originalConfig) => {
     assertEmailProviderConfig(originalConfig);
 
+    const { options, ...configWithoutOptions } = originalConfig;
+    const { sendVerificationRequest, normalizeIdentifier, ...cleanedOptions } =
+      options ?? {};
+    const baseConfig = {
+      ...configWithoutOptions,
+      sendVerificationRequest:
+        sendVerificationRequest ?? configWithoutOptions.sendVerificationRequest,
+      normalizeIdentifier:
+        normalizeIdentifier ?? configWithoutOptions.normalizeIdentifier,
+      ...cleanedOptions,
+    };
+
     return {
-      ...originalConfig,
+      ...baseConfig,
       id: ESPACE_MEMBRE_PROVIDER_ID,
       sendVerificationRequest: async ({
         identifier: betaUsername,
         ...params
       }) => {
         const user = await client.member.getByUsername(betaUsername);
-        return originalConfig.sendVerificationRequest({
+        return baseConfig.sendVerificationRequest({
           ...params,
           identifier:
             user.communication_email === "primary"
@@ -50,7 +62,13 @@ export function getProviderConfigWrapper(
         });
       },
       normalizeIdentifier: (identifier: string) => {
-        return encodeURIComponent(identifier.toLowerCase());
+        const normalizedIdentifier = encodeURIComponent(
+          identifier.toLowerCase(),
+        );
+        return (
+          baseConfig.normalizeIdentifier?.(normalizedIdentifier) ??
+          normalizedIdentifier
+        );
       },
     };
   };

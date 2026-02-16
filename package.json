@@ -1,6 +1,6 @@
 {
   "name": "@incubateur-ademe/next-auth-espace-membre-provider",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "NextAuth.js provider pour l'Espace Membre BetaGouv",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
