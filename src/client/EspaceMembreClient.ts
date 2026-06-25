@@ -107,12 +107,6 @@ export class EspaceMembreClient {
     this.noRetryIfRateLimited =
       noRetryIfRateLimited ?? defaultConfig.noRetryIfRateLimited;
     this.requestTimeout = requestTimeout ?? defaultConfig.requestTimeout;
-
-    if (!this.apiKey) {
-      throw new EspaceMembreClientError(
-        "Une clef d'API est obligatoire pour se connecter à l'Espace Membre.",
-      );
-    }
   }
 
   /**
@@ -140,6 +134,15 @@ export class EspaceMembreClient {
     options: BaseRequestOptions = {},
     fetchOptions: Base.RegisteredFetchOptions = {},
   ) {
+    // Validé ici (au moment de l'appel) et non dans le constructeur : instancier le
+    // client ne doit pas throw (sinon le build des consommateurs casse au module-load,
+    // ex. provider NextAuth eager), seul un vrai appel sans clé doit échouer.
+    if (!this.apiKey) {
+      throw new EspaceMembreClientError(
+        "Une clef d'API est obligatoire pour se connecter à l'Espace Membre.",
+      );
+    }
+
     const method = (options.method ?? "GET").toUpperCase();
 
     const url = new URL(
