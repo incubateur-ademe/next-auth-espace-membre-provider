@@ -1,5 +1,10 @@
 import type { Adapter, AdapterUser } from "next-auth/adapters";
-import type { EspaceMembreClient, Member } from "./client";
+import {
+  type EspaceMembreClient,
+  EspaceMembreClientMemberNotFoundError,
+  type Member,
+  getMemberEmail,
+} from "./client";
 
 type MinimalAdapter = Omit<Adapter, "createUser" | "getUserByEmail"> &
   Required<Pick<Adapter, "createUser" | "getUserByEmail">>;
@@ -12,11 +17,6 @@ function assertMinimalAdapter(
     );
   }
 }
-
-const getUserEmail = (betaGouvUser: Member): string =>
-  betaGouvUser.communication_email === "primary"
-    ? betaGouvUser.primary_email
-    : betaGouvUser.secondary_email;
 
 declare module "@auth/core/adapters" {
   interface AdapterUser {
@@ -64,7 +64,7 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
         const verifiedUser: AdapterUser = {
           ...user,
           name: betaGouvUser.fullname,
-          email: getUserEmail(betaGouvUser),
+          email: getMemberEmail(betaGouvUser),
           username: betaGouvUser.username,
           image: betaGouvUser.avatar,
           isBetaGouvMember: true,
@@ -78,11 +78,39 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
           return originalAdapter.getUserByEmail(emailOrUsername);
         }
 
-        const betaGouvUser = await client.member.getByUsername(
-          emailOrUsername /* email is actually username here */,
-        );
+        let betaGouvUser: Member;
+        try {
+          betaGouvUser = await client.member.getByUsername(
+            emailOrUsername /* email is actually username here */,
+          );
+        } catch (error: unknown) {
+          // NextAuth appelle l'adaptateur avant le callback signIn, qui refuse ce membre.
+          if (error instanceof EspaceMembreClientMemberNotFoundError) {
+            return null;
+          }
+          throw error;
+        }
 
-        return originalAdapter.getUserByEmail(getUserEmail(betaGouvUser));
+        const email = getMemberEmail(betaGouvUser);
+        const user = await originalAdapter.getUserByEmail(email);
+        if (user) {
+          return user;
+        }
+
+        // Un utilisateur créé avec l'autre adresse doit être retrouvé, sans quoi NextAuth
+        // en créerait un second : en 0.3 avec sa secondaire, ou avant que le membre ne
+        // devienne inactif avec sa principale. Le membre choisit lui-même sa secondaire, et
+        // le lien part à l'adresse retenue : sans le même username, la ligne trouvée
+        // pourrait être le compte de quelqu'un d'autre, ouvert par un lien reçu ailleurs.
+        const other =
+          email === betaGouvUser.primary_email
+            ? betaGouvUser.secondary_email
+            : betaGouvUser.primary_email;
+        if (!other || other === email) {
+          return null;
+        }
+        const legacy = await originalAdapter.getUserByEmail(other);
+        return legacy?.username === betaGouvUser.username ? legacy : null;
       },
     };
   };

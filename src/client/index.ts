@@ -1,6 +1,7 @@
 export { EspaceMembreClient } from "./EspaceMembreClient";
 export * from "./error";
 export * from "./models";
+export { getMemberEmail } from "./utils/getMemberEmail";
 
 export namespace EspaceMembreClient {
   /**

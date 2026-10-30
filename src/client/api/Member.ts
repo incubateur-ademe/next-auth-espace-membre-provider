@@ -30,11 +30,8 @@ export class ApiMember {
     }
 
     try {
-      const member: Member = await this.client.makeRequest<Member>(
-        {
-          method: "GET",
-          path: `/member/${encodeURIComponent(username)}`,
-        },
+      const member = await this.client.getOne<Member>(
+        `/members/${encodeURIComponent(username)}`,
         fetchOptions,
       );
       let avatar =
@@ -48,9 +45,11 @@ export class ApiMember {
         avatar,
       };
     } catch (error: unknown) {
+      // Un 422 refuse un identifiant mal formé, que l'API ne peut rattacher à aucun membre.
       if (
         error instanceof EspaceMembreClientError &&
-        error.response?.status === HttpStatusCode.NotFound
+        (error.response?.status === HttpStatusCode.NotFound ||
+          error.response?.status === HttpStatusCode.UnprocessableEntity)
       ) {
         throw new EspaceMembreClientMemberNotFoundError(
           `Aucun membre trouvé avec le nom d'utilisateur ${username}.`,
@@ -60,6 +59,7 @@ export class ApiMember {
 
       throw new EspaceMembreClientError(
         `Une erreur est survenue lors de la récupération du membre ${username}. (${(error as Error).message})`,
+        error instanceof EspaceMembreClientError ? error.response : undefined,
       );
     }
   }

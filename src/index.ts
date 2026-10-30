@@ -75,6 +75,7 @@ export interface EspaceMembreProviderWrappers {
 export function EspaceMembreProvider(config: EspaceMembreProviderConfig) {
   const client = new EspaceMembreClient({
     apiKey: config.espaceMembreApiKey,
+    endpointUrl: config.espaceMembreUrl,
     fetch: config.fetch,
     fetchOptions: config.fetchOptions,
   });

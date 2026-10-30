@@ -5,8 +5,9 @@ import type { AdapterUser } from "next-auth/adapters";
 import { ESPACE_MEMBRE_PROVIDER_ID } from "./ProviderConfig";
 import {
   type EspaceMembreClient,
-  EspaceMembreClientError,
+  EspaceMembreClientMemberNotFoundError,
   type Member,
+  getMemberEmail,
 } from "./client";
 import type { EspaceMembreAuthOptions } from "./types";
 
@@ -65,17 +66,11 @@ export function getCallbacksWrapper(
 
             params.user.name = betaUser.fullname;
             params.user.image = betaUser.avatar;
-            params.user.email =
-              betaUser.communication_email === "primary"
-                ? betaUser.primary_email
-                : betaUser.secondary_email;
+            params.user.email = getMemberEmail(betaUser);
             params.user.id = username;
             params.account.userId = username;
           } catch (error: unknown) {
-            if (
-              error instanceof EspaceMembreClientError &&
-              error.response?.status === 404
-            ) {
+            if (error instanceof EspaceMembreClientMemberNotFoundError) {
               return false;
             }
             throw error;
