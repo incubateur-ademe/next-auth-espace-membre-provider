@@ -17,6 +17,10 @@ export interface EspaceMembreProviderConfig {
    */
   espaceMembreApiKey?: string;
   /**
+   * @see {@link ClientOptions.endpointUrl}
+   */
+  espaceMembreUrl?: string;
+  /**
    * @see {@link ClientOptions.fetch}
    */
   fetch?: EspaceMembreClient.RegisteredFetch;

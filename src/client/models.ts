@@ -1,148 +1,143 @@
-export type Member = {
-  avatar: string | null;
-  bio: string;
-  communication_email: string;
-  competences: string[];
-  domaine: string;
-  email_is_redirection: boolean;
-  fullname: string;
-  github: string;
-  link: string;
-  mattermost: Mattermost;
-  missions: Mission[];
-  primary_email: string;
-  primary_email_status: string;
-  primary_email_status_updated_at: string;
-  role: string;
-  secondary_email: string;
-  startups: MemberStartup[];
-  teams: Team[];
-  updated_at: string;
-  username: string;
-  uuid: string;
-  isActive: boolean;
-};
+/**
+ * Modèles de l'API v1 de l'Espace Membre (`/api/v1`), tels que les décrit son document
+ * OpenAPI (`/api/v1/openapi.json`).
+ */
 
-export type Mission = {
-  employer: string;
-  end: string;
-  id: number;
-  start: string;
-  startups: string[];
-  status: string;
-  user_id: string;
+export type IncubatorRef = {
   uuid: string;
-};
-
-export type Team = {
   ghid: string;
-  incubator: Incubator;
-  incubator_id: string;
-  incubator_title: string;
-  mission: null;
-  name: string;
-  uuid: string;
+  title: string;
 };
 
 export type Incubator = {
   uuid: string;
-  description: string;
-  ghid: string;
-  short_description: string;
   title: string;
-  github?: string;
-  contact?: string;
-  address?: string;
-  highlighted_startups?: string[];
-  owner_id?: string;
-  website?: string;
-};
-
-export type IncubatorWithMembers = Incubator & {
-  members: { uuid: string; fullname: string }[];
-};
-
-export type IncubatorWithStartups = Incubator & {
-  startups: Startup[];
-};
-
-export type Mattermost = {
-  mattermostUser: MattermostUser;
-  mattermostUserInTeamAndActive: MattermostUser;
-};
-
-export type MattermostUser = {
-  auth_data: string;
-  auth_service: string;
-  create_at: number;
-  delete_at: number;
-  disable_welcome_email: boolean;
-  email: string;
-  first_name: string;
-  id: string;
-  last_name: string;
-  last_picture_update: number;
-  locale: string;
-  nickname: string;
-  position: string;
-  props: MattermostUserProps;
-  roles: string;
-  timezone: MattermostTimezone;
-  update_at: number;
-  username: string;
-};
-
-export type MattermostUserProps = {
-  customStatus: string;
-  last_search_pointer: string;
-  show_last_active: string;
-};
-
-export type MattermostTimezone = {
-  automaticTimezone: string;
-  manualTimezone: string;
-  useAutomaticTimezone: string;
-};
-
-export type MemberStartup = {
-  end: string;
   ghid: string;
-  incubator: Incubator;
-  incubator_id: string;
-  isCurrent: boolean;
+  short_description: string | null;
+  description: string | null;
+  contact: string | null;
+  address: string | null;
+  website: string | null;
+  github: string | null;
+  highlighted_startups: string[];
+};
+
+export type Phase = {
   name: string;
-  start: string;
-  uuid: string;
+  start: string | null;
+  end: string | null;
 };
 
 export type Startup = {
   uuid: string;
-  contact: string;
-  description: string;
   ghid: string;
-  incubator_id: string;
   name: string;
-  pitch: string;
-  link?: string;
-  accessibility_status?: string;
-  analyse_risques?: boolean;
-  analyse_risques_url?: string;
-  budget_url?: string;
-  dashlord_url?: string;
-  has_mobile_app?: boolean;
-  is_private_url?: boolean;
-  mailing_list?: string;
-  mon_service_securise?: boolean;
-  repository?: string;
-  stats_url?: string;
-  techno?: string[];
-  thematiques?: string[];
-  usertypes?: string[];
-  sponsors?: string[];
-  fast?: {
-    promotion: number;
-    montant: number;
-  };
+  pitch: string | null;
+  incubator_id: string | null;
+  /** Tous les incubateurs liés, y compris hors du périmètre de la clef. */
+  incubators: IncubatorRef[];
+  contact: string | null;
+  description: string | null;
+  link: string | null;
+  repository: string | null;
+  accessibility_status: string | null;
+  dsfr_status: string | null;
+  techno: string[];
+  thematiques: string[];
+  usertypes: string[];
+  phases: Phase[];
+  current_phase: string | null;
 };
 
-export type StartupWithIncubator = Startup & { incubator: Incubator };
+export type StartupWithIncubator = Startup & {
+  /** L'incubateur principal, celui que désigne `incubator_id`. */
+  incubator: IncubatorRef | null;
+};
+
+/** Produit tel que le rend la liste des produits d'un incubateur. */
+export type IncubatorStartup = {
+  uuid: string;
+  ghid: string;
+  name: string;
+  pitch: string | null;
+  phases: Phase[];
+  current_phase: string | null;
+};
+
+export type MissionStartup = {
+  uuid: string;
+  ghid: string;
+};
+
+export type Mission = {
+  uuid?: string;
+  start: string | null;
+  end?: string | null;
+  status?: string | null;
+  employer?: string | null;
+  startups?: MissionStartup[];
+};
+
+export type Team = {
+  uuid: string;
+  name: string;
+  mission?: string | null;
+  ghid?: string | null;
+  incubator: IncubatorRef | null;
+};
+
+export type MemberStartup = {
+  uuid: string;
+  ghid: string | null;
+  name: string | null;
+  start: string | null;
+  end: string | null;
+  incubator_id: string | null;
+  incubator: IncubatorRef | null;
+  incubators: IncubatorRef[];
+  isCurrent: boolean;
+};
+
+/** Fiche complète d'un membre (`GET /api/v1/members/{id}`). */
+export type Member = {
+  uuid: string;
+  username: string;
+  fullname: string;
+  role?: string | null;
+  domaine?: string | null;
+  bio?: string | null;
+  link?: string | null;
+  github?: string | null;
+  primary_email: string | null;
+  secondary_email: string | null;
+  competences?: string[] | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  missions: Mission[];
+  teams: Team[] | null;
+  startups: MemberStartup[];
+  avatar: string | null;
+  isActive: boolean;
+};
+
+/** Membre tel que le rend la liste des membres d'un incubateur. */
+export type IncubatorMember = {
+  uuid: string;
+  username: string;
+  fullname: string;
+  github: string | null;
+  primary_email: string | null;
+  secondary_email: string | null;
+  missions: Mission[];
+  /** Voie par laquelle le membre relève de l'incubateur. */
+  attachment: "startups" | "teams" | "both";
+  teams: string[];
+};
+
+export type IncubatorWithMembers = Incubator & {
+  members: IncubatorMember[];
+};
+
+export type IncubatorWithStartups = Incubator & {
+  startups: IncubatorStartup[];
+};

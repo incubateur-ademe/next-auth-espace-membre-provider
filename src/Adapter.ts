@@ -1,5 +1,10 @@
 import type { Adapter, AdapterUser } from "next-auth/adapters";
-import type { EspaceMembreClient, Member } from "./client";
+import {
+  type EspaceMembreClient,
+  EspaceMembreClientMemberNotFoundError,
+  type Member,
+  getMemberEmail,
+} from "./client";
 
 type MinimalAdapter = Omit<Adapter, "createUser" | "getUserByEmail"> &
   Required<Pick<Adapter, "createUser" | "getUserByEmail">>;
@@ -12,11 +17,6 @@ function assertMinimalAdapter(
     );
   }
 }
-
-const getUserEmail = (betaGouvUser: Member): string =>
-  betaGouvUser.communication_email === "primary"
-    ? betaGouvUser.primary_email
-    : betaGouvUser.secondary_email;
 
 declare module "@auth/core/adapters" {
   interface AdapterUser {
@@ -64,7 +64,7 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
         const verifiedUser: AdapterUser = {
           ...user,
           name: betaGouvUser.fullname,
-          email: getUserEmail(betaGouvUser),
+          email: getMemberEmail(betaGouvUser),
           username: betaGouvUser.username,
           image: betaGouvUser.avatar,
           isBetaGouvMember: true,
@@ -78,11 +78,34 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
           return originalAdapter.getUserByEmail(emailOrUsername);
         }
 
-        const betaGouvUser = await client.member.getByUsername(
-          emailOrUsername /* email is actually username here */,
-        );
+        let betaGouvUser: Member;
+        try {
+          betaGouvUser = await client.member.getByUsername(
+            emailOrUsername /* email is actually username here */,
+          );
+        } catch (error: unknown) {
+          // NextAuth appelle l'adaptateur avant le callback signIn, qui refuse ce membre.
+          if (error instanceof EspaceMembreClientMemberNotFoundError) {
+            return null;
+          }
+          throw error;
+        }
 
-        return originalAdapter.getUserByEmail(getUserEmail(betaGouvUser));
+        // Un utilisateur créé en 0.3 avec son adresse secondaire doit être retrouvé, sans
+        // quoi NextAuth en créerait un second pour le même membre.
+        for (const email of new Set([
+          getMemberEmail(betaGouvUser),
+          betaGouvUser.secondary_email,
+        ])) {
+          if (!email) {
+            continue;
+          }
+          const user = await originalAdapter.getUserByEmail(email);
+          if (user) {
+            return user;
+          }
+        }
+        return null;
       },
     };
   };

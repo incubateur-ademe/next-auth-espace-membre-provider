@@ -1,6 +1,6 @@
 import type { CommonProviderOptions } from "next-auth/providers";
 import type { NodemailerConfig } from "next-auth/providers/nodemailer";
-import type { EspaceMembreClient } from "./client";
+import { type EspaceMembreClient, getMemberEmail } from "./client";
 
 /**
  * À utiliser lors de l'utilisation de la fonction `signIn` de l'API de NextAuth.
@@ -55,10 +55,7 @@ export function getProviderConfigWrapper(
         const user = await client.member.getByUsername(betaUsername);
         return baseConfig.sendVerificationRequest({
           ...params,
-          identifier:
-            user.communication_email === "primary"
-              ? user.primary_email
-              : user.secondary_email,
+          identifier: getMemberEmail(user),
         });
       },
       normalizeIdentifier: (identifier: string) => {
