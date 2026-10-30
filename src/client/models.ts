@@ -118,6 +118,11 @@ export type Member = {
   startups: MemberStartup[];
   avatar: string | null;
   isActive: boolean;
+  /**
+   * Adresse choisie par le membre. Absente de l'API v1 à ce jour, et prise en compte par
+   * `getMemberEmail` dès qu'elle y apparaît.
+   */
+  communication_email?: "primary" | "secondary" | null;
 };
 
 /** Membre tel que le rend la liste des membres d'un incubateur. */

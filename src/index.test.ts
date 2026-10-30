@@ -6,6 +6,7 @@ import {
   EspaceMembreClient,
   EspaceMembreClientError,
   EspaceMembreClientMemberNotFoundError,
+  getMemberEmail,
 } from "./client";
 
 const ORIGIN = "https://em.exemple.invalid";
@@ -289,6 +290,83 @@ describe("la connexion par l'Espace Membre", () => {
         saisie,
       ).resolves.toBe(false);
     }
+  });
+});
+
+describe("l'adresse retenue pour un membre", () => {
+  it("joint un partant sur sa secondaire, retrouve son compte créé sur la principale, et suit la préférence quand l'API la rend", async () => {
+    const fiche = {
+      ...member("tao.exemple", {
+        primary: "tao@beta.invalid",
+        secondary: "tao@perso.invalid",
+      }),
+      isActive: false,
+    };
+    // Given un membre parti, dont le compte a été créé du temps de sa boîte beta.gouv
+    const { fetch } = transport({
+      [`${ORIGIN}/api/v1/members/tao.exemple`]: () =>
+        Response.json({ data: fiche }),
+    });
+    const provider = EspaceMembreProvider({
+      espaceMembreApiKey: "em1_cle",
+      espaceMembreUrl: ORIGIN,
+      fetch,
+      authOptions: { allowInactive: true },
+    });
+    const sendVerificationRequest = vi.fn(async () => {});
+    const config = provider.ProviderWrapper({
+      id: "nodemailer",
+      type: "email",
+      sendVerificationRequest,
+      options: {},
+    } as unknown as NodemailerConfig);
+    const enBase = {
+      id: "u-2",
+      email: "tao@beta.invalid",
+      username: "tao.exemple",
+    };
+    const getUserByEmail = vi.fn(async (email: string) =>
+      email === enBase.email ? enBase : null,
+    );
+    const adapter = provider.AdapterWrapper({
+      createUser: vi.fn(),
+      getUserByEmail,
+    } as unknown as Adapter);
+
+    // When il demande un lien
+    await config.sendVerificationRequest({
+      identifier: "tao.exemple",
+    } as never);
+    const trouve = await adapter.getUserByEmail?.("tao.exemple");
+
+    // Then le lien part à la boîte qu'il lit encore, et son compte existant est retrouvé
+    expect(sendVerificationRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ identifier: "tao@perso.invalid" }),
+    );
+    expect(getUserByEmail.mock.calls.map(([email]) => email)).toEqual([
+      "tao@perso.invalid",
+      "tao@beta.invalid",
+    ]);
+    expect(trouve).toBe(enBase);
+
+    // Then la préférence l'emporte dès que l'API la rend, et chaque règle retombe sur
+    // l'autre adresse quand la sienne manque
+    expect(getMemberEmail({ ...fiche, communication_email: "primary" })).toBe(
+      "tao@beta.invalid",
+    );
+    expect(
+      getMemberEmail({
+        ...fiche,
+        isActive: true,
+        communication_email: "secondary",
+      }),
+    ).toBe("tao@perso.invalid");
+    expect(getMemberEmail({ ...fiche, secondary_email: null })).toBe(
+      "tao@beta.invalid",
+    );
+    expect(
+      getMemberEmail({ ...fiche, isActive: true, primary_email: null }),
+    ).toBe("tao@perso.invalid");
   });
 });
 

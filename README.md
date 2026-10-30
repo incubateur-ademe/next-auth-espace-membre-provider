@@ -78,7 +78,7 @@ const client = new EspaceMembreClient({
   });
 
 const member: Member = await client.member.getByUsername("nom-d-utilisateur");
-const email = getMemberEmail(member); // adresse principale, à défaut secondaire
+const email = getMemberEmail(member); // préférence du membre si l'API la rend, sinon principale (secondaire si inactif)
 ```
 
 Les listes (`startup.getAll`, `incubator.getAll`) sont lues page après page. Une lecture qui
@@ -131,10 +131,12 @@ La 1.0 quitte l'API `/api/protected` pour l'API v1. Ce qui change pour un consom
 - **Les refus.** Un membre hors du périmètre de la clef lève une `EspaceMembreClientError` de
   statut 403, et non `EspaceMembreClientMemberNotFoundError`. Un identifiant mal formé
   (422) lève `EspaceMembreClientMemberNotFoundError`, comme un 404.
-- **`communication_email` disparaît.** Le lien part à l'adresse principale, à défaut la
-  secondaire (`getMemberEmail`). L'adaptateur cherche l'utilisateur en base par cette
-  adresse, puis par la secondaire à condition que la ligne porte le même `username`. Un
-  utilisateur créé en 0.3 avec sa secondaire mais sans `username` ne sera plus retrouvé.
+- **`communication_email` n'est plus rendu par la v1.** Le lien part à l'adresse principale
+  d'un membre actif, à la secondaire d'un membre inactif, chacune retombant sur l'autre
+  (`getMemberEmail`). La préférence l'emporte dès que l'API la rend à nouveau.
+  L'adaptateur cherche l'utilisateur en base par cette adresse, puis par l'autre à
+  condition que la ligne porte le même `username`. Un utilisateur créé en 0.3 avec l'autre
+  adresse mais sans `username` ne sera plus retrouvé.
 - **`Member`** suit la fiche v1.
   - Disparaissent `communication_email`, `mattermost`, `primary_email_status`,
     `primary_email_status_updated_at` et `email_is_redirection`.

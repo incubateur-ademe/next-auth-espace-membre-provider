@@ -97,15 +97,19 @@ export function getAdapterWrapper(client: EspaceMembreClient): AdapterWrapper {
           return user;
         }
 
-        // Un utilisateur créé en 0.3 avec sa secondaire doit être retrouvé, sans quoi
-        // NextAuth en créerait un second. Le membre choisit lui-même cette adresse, et le
-        // lien part à la principale : sans le même username, la ligne trouvée serait le
-        // compte de quelqu'un d'autre, ouvert par un lien reçu ailleurs.
-        const secondary = betaGouvUser.secondary_email;
-        if (!secondary || secondary === email) {
+        // Un utilisateur créé avec l'autre adresse doit être retrouvé, sans quoi NextAuth
+        // en créerait un second : en 0.3 avec sa secondaire, ou avant que le membre ne
+        // devienne inactif avec sa principale. Le membre choisit lui-même sa secondaire, et
+        // le lien part à l'adresse retenue : sans le même username, la ligne trouvée
+        // pourrait être le compte de quelqu'un d'autre, ouvert par un lien reçu ailleurs.
+        const other =
+          email === betaGouvUser.primary_email
+            ? betaGouvUser.secondary_email
+            : betaGouvUser.primary_email;
+        if (!other || other === email) {
           return null;
         }
-        const legacy = await originalAdapter.getUserByEmail(secondary);
+        const legacy = await originalAdapter.getUserByEmail(other);
         return legacy?.username === betaGouvUser.username ? legacy : null;
       },
     };
