@@ -240,7 +240,11 @@ describe("la connexion par l'Espace Membre", () => {
       espaceMembreUrl: ORIGIN,
       fetch,
     });
-    const enBase = { id: "u-1", email: "camille@perso.invalid" };
+    const enBase = {
+      id: "u-1",
+      email: "camille@perso.invalid",
+      username: "camille.exemple",
+    };
     const getUserByEmail = vi.fn(async (email: string) =>
       email === enBase.email ? enBase : null,
     );
@@ -258,6 +262,15 @@ describe("la connexion par l'Espace Membre", () => {
       "camille@perso.invalid",
     ]);
     expect(trouve).toBe(enBase);
+
+    // Given une autre personne inscrite avec l'adresse que ce membre a déclarée en secondaire
+    enBase.username = "autre.personne";
+
+    // Then le membre n'ouvre pas son compte, le lien partant à sa propre principale
+    await expect(
+      adapter.getUserByEmail?.("camille.exemple"),
+    ).resolves.toBeNull();
+    enBase.username = "camille.exemple";
 
     // When un username inconnu, puis une adresse saisie à la place du username, arrivent
     // jusqu'à l'adaptateur et au callback, comme NextAuth les y fait passer

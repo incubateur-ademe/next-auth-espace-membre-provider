@@ -132,9 +132,9 @@ La 1.0 quitte l'API `/api/protected` pour l'API v1. Ce qui change pour un consom
   statut 403, et non `EspaceMembreClientMemberNotFoundError`. Un identifiant mal formé
   (422) lève `EspaceMembreClientMemberNotFoundError`, comme un 404.
 - **`communication_email` disparaît.** Le lien part à l'adresse principale, à défaut la
-  secondaire (`getMemberEmail`). L'adaptateur cherche l'utilisateur en base par la
-  principale puis par la secondaire, ce qui retrouve un utilisateur créé en 0.3 avec l'une
-  ou l'autre.
+  secondaire (`getMemberEmail`). L'adaptateur cherche l'utilisateur en base par cette
+  adresse, puis par la secondaire à condition que la ligne porte le même `username`. Un
+  utilisateur créé en 0.3 avec sa secondaire mais sans `username` ne sera plus retrouvé.
 - **`Member`** suit la fiche v1.
   - Disparaissent `communication_email`, `mattermost`, `primary_email_status`,
     `primary_email_status_updated_at` et `email_is_redirection`.
