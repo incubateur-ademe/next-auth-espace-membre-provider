@@ -4,7 +4,7 @@ import type { Member } from "../models";
 /**
  * L'adresse à laquelle joindre un membre.
  *
- * La préférence `communication_email` l'emporte quand l'API la rend. Sinon, un membre
+ * La préférence `communication_email` l'emporte quand elle est rendue. Sinon, un membre
  * inactif est joint sur sa secondaire, sa principale étant une boîte beta.gouv que son
  * départ supprime. Un membre actif l'est sur sa principale. Chaque règle retombe sur
  * l'autre adresse quand la sienne manque.

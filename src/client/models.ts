@@ -119,8 +119,8 @@ export type Member = {
   avatar: string | null;
   isActive: boolean;
   /**
-   * Adresse choisie par le membre. Absente de l'API v1 à ce jour, et prise en compte par
-   * `getMemberEmail` dès qu'elle y apparaît.
+   * Adresse choisie par le membre, et retenue par `getMemberEmail`. Absente des
+   * environnements qui précèdent betagouv/espace-membre-next#1615.
    */
   communication_email?: "primary" | "secondary" | null;
 };
